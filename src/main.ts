@@ -4,8 +4,13 @@ import { router } from './router';
 import './style.css';
 import App from './App.vue';
 
-import { registerSW } from 'virtual:pwa-register';
-registerSW({ immediate: true });
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').catch((err) => {
+      console.error('Service worker kaydı başarısız:', err);
+    });
+  });
+}
 
 const app = createApp(App);
 app.use(createPinia());
