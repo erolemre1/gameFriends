@@ -33,7 +33,9 @@ const shouldShowInstallModal = () => {
 const showNativeLikeInstallModal = () => {
   if (!shouldShowInstallModal()) return;
   setTimeout(() => {
-    showInstallModal.value = true;
+    if (shouldShowInstallModal()) {
+      showInstallModal.value = true;
+    }
   }, 2500);
 };
 
@@ -91,6 +93,7 @@ export function usePwaInstall() {
   return {
     showInstallModal,
     isIOS,
+    deferredPrompt,
     installApp,
     dismissModal
   };
