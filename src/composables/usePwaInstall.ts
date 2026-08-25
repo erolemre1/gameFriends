@@ -42,8 +42,8 @@ export function usePwaInstall() {
     const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
     isIOS.value = isIOSDevice;
 
-    if (window.pwaDeferredPrompt) {
-      deferredPrompt.value = window.pwaDeferredPrompt;
+    if ((window as any).pwaDeferredPrompt) {
+      deferredPrompt.value = (window as any).pwaDeferredPrompt;
     }
 
     window.addEventListener('beforeinstallprompt', (e: Event) => {
