@@ -4,7 +4,6 @@ import { onMounted, ref } from 'vue';
 const showInstallModal = ref(false);
 const isIOS = ref(false);
 const deferredPrompt = ref<any>(null);
-let installTimer: ReturnType<typeof setTimeout> | undefined;
 
 const isStandalone = () => {
   return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
@@ -51,7 +50,7 @@ const installApp = async () => {
 const openInstallModal = () => {
   if (!canShowModal() || (!isIOS.value && !deferredPrompt.value)) return;
 
-  installTimer = setTimeout(() => {
+  setTimeout(() => {
     if (canShowModal()) {
       showInstallModal.value = true;
     }
