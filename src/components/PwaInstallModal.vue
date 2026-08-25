@@ -4,6 +4,7 @@ import { onMounted, ref } from 'vue';
 const showInstallModal = ref(false);
 const isIOS = ref(false);
 const deferredPrompt = ref<any>(null);
+let installTimer: ReturnType<typeof setTimeout> | undefined;
 
 const isStandalone = () => {
   return window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
@@ -48,9 +49,9 @@ const installApp = async () => {
 };
 
 const openInstallModal = () => {
-  if (!canShowModal()) return;
+  if (!canShowModal() || (!isIOS.value && !deferredPrompt.value)) return;
 
-  setTimeout(() => {
+  installTimer = setTimeout(() => {
     if (canShowModal()) {
       showInstallModal.value = true;
     }
@@ -59,11 +60,6 @@ const openInstallModal = () => {
 
 onMounted(() => {
   isIOS.value = /iPad|iPhone|iPod/.test(window.navigator.userAgent) && !(window as any).MSStream;
-
-  const promptFromWindow = (window as any).pwaDeferredPrompt;
-  if (promptFromWindow) {
-    deferredPrompt.value = promptFromWindow;
-  }
 
   const handleVisibilityChange = () => {
     if (document.visibilityState === 'visible' && !showInstallModal.value) {
@@ -83,7 +79,7 @@ onMounted(() => {
     dismissModal();
   });
 
-  openInstallModal();
+  if (isIOS.value) openInstallModal();
 });
 </script>
 
