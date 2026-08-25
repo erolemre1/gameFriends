@@ -5,53 +5,54 @@ const showInstallModal = ref(false);
 const isIOS = ref(false);
 
 export function usePwaInstall() {
-  // Senin yazdığın çerez (cookie) fonksiyonları
   const setCookie = (name: string, value: string, days: number) => {
-    let expires = "";
+    let expires = '';
     if (days) {
       const date = new Date();
-      date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-      expires = "; expires=" + date.toUTCString();
+      date.setTime(date.getTime() + days * 24 * 60 * 60 * 1000);
+      expires = '; expires=' + date.toUTCString();
     }
-    document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    document.cookie = name + '=' + (value || '') + expires + '; path=/';
   };
 
   const getCookie = (name: string) => {
-    const nameEQ = name + "=";
+    const nameEQ = name + '=';
     const ca = document.cookie.split(';');
     for (let i = 0; i < ca.length; i++) {
       let c = ca[i];
-      while (c.charAt(0) == ' ') c = c.substring(1, c.length);
-      if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
+      while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+      if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
   };
 
+  const openInstallModal = () => {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
+    if (isStandalone || getCookie('installPromptShown')) {
+      return;
+    }
+
+    setTimeout(() => {
+      showInstallModal.value = true;
+    }, 2500);
+  };
+
   onMounted(() => {
-    // 1. Android / Masaüstü için
+    const userAgent = window.navigator.userAgent;
+    const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
+    isIOS.value = isIOSDevice;
+
+    if (window.pwaDeferredPrompt) {
+      deferredPrompt.value = window.pwaDeferredPrompt;
+    }
+
     window.addEventListener('beforeinstallprompt', (e: Event) => {
       e.preventDefault();
       deferredPrompt.value = e;
-      
-      // Çerez yoksa 2.5 saniye sonra göster
-      if (!getCookie('installPromptShown')) {
-        setTimeout(() => {
-          showInstallModal.value = true;
-        }, 2500);
-      }
+      openInstallModal();
     });
 
-    // 2. iOS Kontrolü
-    const userAgent = window.navigator.userAgent;
-    const isIOSDevice = /iPad|iPhone|iPod/.test(userAgent) && !(window as any).MSStream;
-    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || (window.navigator as any).standalone === true;
-
-    if (isIOSDevice && !isStandalone && !getCookie('installPromptShown')) {
-      isIOS.value = true;
-      setTimeout(() => {
-        showInstallModal.value = true;
-      }, 2500);
-    }
+    openInstallModal();
   });
 
   const installApp = async () => {
@@ -68,7 +69,6 @@ export function usePwaInstall() {
 
   const dismissModal = () => {
     showInstallModal.value = false;
-    // Tıpkı Çiftlik projesindeki gibi 1 günlük çerez bırakıyoruz
     setCookie('installPromptShown', 'true', 1);
   };
 

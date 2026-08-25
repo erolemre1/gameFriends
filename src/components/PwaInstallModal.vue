@@ -1,29 +1,7 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
 import { usePwaInstall } from '../composables/usePwaInstall';
 
 const { showInstallModal, isIOS, installApp, dismissModal } = usePwaInstall();
-
-onMounted(() => {
-  // Eğer event Vue yüklenmeden önce tetiklendiyse index.html'den al
-  if (window.pwaDeferredPrompt) {
-    deferredPrompt.value = window.pwaDeferredPrompt;
-    if (!getCookie('installPromptShown')) {
-      setTimeout(() => { showModal.value = true; }, 2500);
-    }
-  }
-
-  // Eğer Vue yüklendikten sonra tetiklenirse buradan yakala
-  window.addEventListener('beforeinstallprompt', (e: Event) => {
-    e.preventDefault();
-    deferredPrompt.value = e;
-    if (!getCookie('installPromptShown')) {
-      setTimeout(() => { showModal.value = true; }, 2500);
-    }
-  });
-
-  // ... iOS kontrolleri (önceki kodun aynısı)
-});
 </script>
 
 <template>
@@ -42,12 +20,10 @@ onMounted(() => {
       <div class="text-6xl mb-3">📲</div>
       <h3 class="text-emerald-700 text-xl font-bold mt-0 mb-2">Uygulamayı Cihazınıza Yükleyin</h3>
       
-      <!-- Android Metni -->
       <p v-if="!isIOS" class="text-slate-600 text-sm mb-5">
         Okey Masa Bulucu'yu telefonunuza yükleyerek masaları daha hızlı bulabilir ve anlık bildirimleri alabilirsiniz!
       </p>
 
-      <!-- iOS Metni -->
       <p v-else class="text-slate-600 text-sm mb-5 text-left">
         Apple politikaları gereği uygulamamızı yüklemek için:<br><br>
         <b>1.</b> Tarayıcınızın alt kısmındaki <b>Paylaş</b> ikonuna dokunun.<br>
