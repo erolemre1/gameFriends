@@ -1,7 +1,20 @@
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { usePwaInstall } from '../composables/usePwaInstall';
 
-const { showInstallModal, isIOS, installApp, dismissModal } = usePwaInstall();
+export default defineComponent({
+  name: 'PwaInstallModal',
+  setup() {
+    const { showInstallModal, isIOS, installApp, dismissModal } = usePwaInstall();
+
+    return {
+      showInstallModal,
+      isIOS,
+      installApp,
+      dismissModal
+    };
+  }
+});
 </script>
 
 <template>
