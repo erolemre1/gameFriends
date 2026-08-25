@@ -1,7 +1,29 @@
 <script setup lang="ts">
+import { onMounted } from 'vue';
 import { usePwaInstall } from '../composables/usePwaInstall';
 
 const { showInstallModal, isIOS, installApp, dismissModal } = usePwaInstall();
+
+onMounted(() => {
+  // Eğer event Vue yüklenmeden önce tetiklendiyse index.html'den al
+  if (window.pwaDeferredPrompt) {
+    deferredPrompt.value = window.pwaDeferredPrompt;
+    if (!getCookie('installPromptShown')) {
+      setTimeout(() => { showModal.value = true; }, 2500);
+    }
+  }
+
+  // Eğer Vue yüklendikten sonra tetiklenirse buradan yakala
+  window.addEventListener('beforeinstallprompt', (e: Event) => {
+    e.preventDefault();
+    deferredPrompt.value = e;
+    if (!getCookie('installPromptShown')) {
+      setTimeout(() => { showModal.value = true; }, 2500);
+    }
+  });
+
+  // ... iOS kontrolleri (önceki kodun aynısı)
+});
 </script>
 
 <template>
