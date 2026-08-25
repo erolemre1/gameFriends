@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import type { Table, Player } from '../types/table';
 
 export const useTableStore = defineStore('table', () => {
